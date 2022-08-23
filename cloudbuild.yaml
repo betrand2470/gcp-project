@@ -15,8 +15,7 @@ steps:
   # [START cloudbuild_python_image_yaml]
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 
-           'us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}', '.']
+    args: ['build', '-t', 'gcr.io/hello-world-360303/github.com/betrand2470/gcp-project:$COMMIT_SHA','.']
   # [END cloudbuild_python_image_yaml]
 
   # [START cloudbuild_python_push_yaml]
