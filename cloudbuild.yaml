@@ -1,4 +1,8 @@
 steps:
+#First Clone from Google Cloud Source Repository
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone','https://source.developers.google.com/p/${_PROJECT}/r/${_REPO_NAME}']
+
   # Install dependencies
   - name: python
     entrypoint: pip
@@ -21,7 +25,7 @@ steps:
   # [START cloudbuild_python_push_yaml]
   # Docker push to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push',  'us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}']
+    args: ['push', 'gcr.io/${_PROJECT}/${_CONTAINERNAME}:${_VERSION}']
   # [END cloudbuild_python_push_yaml]
   
   # [START cloudbuild_python_deploy_yaml]
@@ -34,15 +38,15 @@ steps:
   # [END cloudbuild_python_deploy_yaml]
   
 # [START cloudbuild_python_logs_yaml]
-# Save test logs to Google Cloud Storage
-artifacts:
-  objects:
-    location: gs://${hello-world360303}/
-    paths:
-      - ${SHORT_SHA}_test_log.xml
+# # Save test logs to Google Cloud Storage
+# artifacts:
+#   objects:
+#     location: gs://${hello-world360303}/
+#     paths:
+#       - ${SHORT_SHA}_test_log.xml
 # [END cloudbuild_python_logs_yaml]
-# Store images in Google Artifact Registry 
-images:
-  - us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}
-# [END cloudbuild_python_yaml]
+# # Store images in Google Artifact Registry 
+# images:
+#   - us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}
+# # [END cloudbuild_python_yaml]
 
