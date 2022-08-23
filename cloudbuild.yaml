@@ -1,0 +1,49 @@
+steps:
+  # Install dependencies
+  - name: python
+    entrypoint: pip
+    args: ["install", "-r", "requirements.txt", "--user"]
+# [END cloudbuild_python_dependencies_yaml]
+
+  # [START cloudbuild_python_tests_yaml]
+  # Run unit tests
+  - name: python
+    entrypoint: python
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml"] 
+  # [END cloudbuild_python_tests_yaml]
+
+  # [START cloudbuild_python_image_yaml]
+  # Docker Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 
+           'us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}', '.']
+  # [END cloudbuild_python_image_yaml]
+
+  # [START cloudbuild_python_push_yaml]
+  # Docker push to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push',  'us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}']
+  # [END cloudbuild_python_push_yaml]
+  
+  # [START cloudbuild_python_deploy_yaml]
+  # Deploy to Cloud Run
+  - name: google/cloud-sdk
+    args: ['gcloud', 'run', 'deploy', 'helloworld-${SHORT_SHA}', 
+           '--image=us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}', 
+           '--region', 'us-central1', '--platform', 'managed', 
+           '--allow-unauthenticated']
+  # [END cloudbuild_python_deploy_yaml]
+  
+# [START cloudbuild_python_logs_yaml]
+# Save test logs to Google Cloud Storage
+artifacts:
+  objects:
+    location: gs://${hello-world360303}/
+    paths:
+      - ${SHORT_SHA}_test_log.xml
+# [END cloudbuild_python_logs_yaml]
+# Store images in Google Artifact Registry 
+images:
+  - us-south1-docker.pkg.dev/${hello-world-360303}/${hello-world}/hello_world:${SHORT_SHA}
+# [END cloudbuild_python_yaml]
+
